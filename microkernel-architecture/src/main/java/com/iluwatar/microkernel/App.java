@@ -22,12 +22,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.iluwatar.microkernel;
 
+import com.iluwatar.microkernel.cli.CommandLineInterface;
+import com.iluwatar.microkernel.core.MicroKernel;
+import com.iluwatar.microkernel.ipc.Message;
+import com.iluwatar.microkernel.plugins.PluginCatalog;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Demonstrates a Microkernel architecture featuring a Plugin Registry and Inter-Process
+ * Communication (IPC).
+ *
+ * <p>The {@link MicroKernel} delegates all feature capabilities to plugins. Plugins do not interact
+ * by calling methods on one another; instead, they pass {@link Message} records through the
+ * kernel's IPC router.
+ */
+@Slf4j
 public class App {
 
+  /**
+   * Starts the interactive microkernel application.
+   *
+   * @param args command-line arguments
+   */
   public static void main(String[] args) {
-    //TODO: Execute Core Application
-  }
+    // 1. Initialize the Core System
+    var kernel = new MicroKernel();
+    var catalog = new PluginCatalog();
 
+    // 2. Initialize the User Interface, injecting the kernel
+    var cli = new CommandLineInterface(kernel, catalog);
+
+    // 3. Start the application loop
+    cli.run();
+  }
 }
