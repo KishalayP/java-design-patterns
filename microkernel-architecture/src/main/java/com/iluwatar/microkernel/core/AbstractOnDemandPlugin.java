@@ -22,37 +22,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.iluwatar.microkernel.registry;
+package com.iluwatar.microkernel.core;
 
-import com.iluwatar.microkernel.core.Plugin;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+import com.iluwatar.microkernel.ipc.IpcRouter;
 
-@Slf4j
-/** Stores plugins by name for lookup and message routing. */
-public class PluginRegistry {
+/** Provides start-state handling for plugins that act only when messaged. */
+public abstract class AbstractOnDemandPlugin implements Plugin {
 
-  private final Map<String, Plugin> plugins = new HashMap<>();
+  protected IpcRouter ipcRouter;
+  private boolean isStarted = false;
 
-  /** Registers a plugin under its name, replacing any existing plugin with that name. */
-  public void register(Plugin plugin) {
-    plugins.put(plugin.getName(), plugin);
+  /** {@inheritDoc} */
+  @Override
+  public void initialize(IpcRouter ipcRouter) {
+    this.ipcRouter = ipcRouter;
   }
 
-  /** Removes the plugin registered under the given name, if present. */
-  public void deregister(String name) {
-    plugins.remove(name);
+  /** {@inheritDoc} */
+  @Override
+  public void onStart() {
+    // Just toggle the state; no background task to start
+    this.isStarted = true;
   }
 
-  /** Returns the plugin registered under the given name, or {@code null} if absent. */
-  public Plugin getPlugin(String name) {
-    return plugins.get(name);
+  /** {@inheritDoc} */
+  @Override
+  public void onStop() {
+    // Just toggle the state; no background task to stop
+    this.isStarted = false;
   }
 
-  /** Returns an immutable snapshot of all currently registered plugin names. */
-  public List<String> getRegisteredPluginNames() {
-    return plugins.keySet().stream().toList();
+  /** {@inheritDoc} */
+  @Override
+  public boolean isStarted() {
+    return this.isStarted;
   }
+
+  // handleMessage(Message message) remains abstract and must be implemented by children
 }

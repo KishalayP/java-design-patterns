@@ -22,37 +22,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.iluwatar.microkernel.registry;
+package com.iluwatar.microkernel.core;
 
-import com.iluwatar.microkernel.core.Plugin;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+import com.iluwatar.microkernel.ipc.IpcRouter;
+import com.iluwatar.microkernel.ipc.Message;
 
-@Slf4j
-/** Stores plugins by name for lookup and message routing. */
-public class PluginRegistry {
+/** Defines the lifecycle and message-handling contract for a microkernel plugin. */
+public interface Plugin {
 
-  private final Map<String, Plugin> plugins = new HashMap<>();
+  /** Returns the unique name used to register and address this plugin. */
+  String getName();
 
-  /** Registers a plugin under its name, replacing any existing plugin with that name. */
-  public void register(Plugin plugin) {
-    plugins.put(plugin.getName(), plugin);
-  }
+  /** Returns a human-readable summary of this plugin. */
+  String getDescription();
 
-  /** Removes the plugin registered under the given name, if present. */
-  public void deregister(String name) {
-    plugins.remove(name);
-  }
+  /**
+   * Provides the router plugins may use to communicate through the kernel.
+   *
+   * @param ipcRouter the kernel's message router
+   */
+  void initialize(IpcRouter ipcRouter);
 
-  /** Returns the plugin registered under the given name, or {@code null} if absent. */
-  public Plugin getPlugin(String name) {
-    return plugins.get(name);
-  }
+  /** Starts the plugin and allocates any required resources. */
+  void onStart();
 
-  /** Returns an immutable snapshot of all currently registered plugin names. */
-  public List<String> getRegisteredPluginNames() {
-    return plugins.keySet().stream().toList();
-  }
+  /** Stops the plugin and releases any allocated resources. */
+  void onStop();
+
+  /**
+   * Returns whether the plugin is started and can receive messages.
+   *
+   * @return true if the plugin is started
+   */
+  boolean isStarted();
+
+  /**
+   * Handles a message routed to this plugin.
+   *
+   * @param message the incoming message
+   * @return the plugin's response
+   */
+  String handleMessage(Message message);
 }
