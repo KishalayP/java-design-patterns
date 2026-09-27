@@ -30,10 +30,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Page Controller pattern is utilized when we want to simplify relationship in a dynamic website.
- * It is an approach of one front page leading to one logical file that handles HTTP requests and actions.
- * In this example, we build a website with signup page handling an input form with Signup Controller, Signup View, and Signup Model
- * and after signup, it is redirected to a user page handling with User Controller, User View, and User Model.
-*/
+ * It is an approach of one front page leading to one logical file that handles HTTP requests and
+ * actions. In this example, we build a website with signup page handling an input form with Signup
+ * Controller, Signup View, and Signup Model and after signup, it is redirected to a user page
+ * handling with User Controller, User View, and User Model.
+ */
 @Slf4j
 @SpringBootApplication
 public class App {
@@ -43,6 +44,11 @@ public class App {
    * @param args command line args
    */
   public static void main(final String[] args) {
-    SpringApplication.run(App.class, args);
+    var context = SpringApplication.run(App.class, args);
+    if (args.length > 0 && "test".equals(args[0])) {
+      // Close the context immediately during tests to prevent Tomcat/background threads from
+      // hanging the JVM
+      context.close();
+    }
   }
 }

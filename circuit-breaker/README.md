@@ -33,6 +33,10 @@ Wikipedia says
 
 > Circuit breaker is a design pattern used in modern software development. It is used to detect failures and encapsulates the logic of preventing a failure from constantly recurring, during maintenance, temporary external system failure or unexpected system difficulties.
 
+Flowchart
+
+![Circuit Breaker flowchart](./etc/circuit-breaker-flowchart.png)
+
 ## Programmatic Example of Circuit Breaker Pattern in Java
 
 This Java example demonstrates how the Circuit Breaker pattern can manage remote service failures and maintain system stability.
@@ -189,7 +193,7 @@ The Circuit Breaker pattern is applicable:
 * Cloud-based services to gracefully handle the failure of external services
 * E-commerce platforms to manage high volumes of transactions and dependency on external APIs
 * Microservices architectures for maintaining system stability and responsiveness
-* [Spring Circuit Breaker module](https://spring.io/guides/gs/circuit-breaker)
+* [Spring Circuit Breaker module](https://spring.io/guides/gs/cloud-circuit-breaker)
 * [Netflix Hystrix API](https://github.com/Netflix/Hystrix)
 
 ## Benefits and Trade-offs of Circuit Breaker Pattern

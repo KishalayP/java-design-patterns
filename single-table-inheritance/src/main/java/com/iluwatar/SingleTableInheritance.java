@@ -37,32 +37,28 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Single Table Inheritance pattern :
+ * Single Table Inheritance pattern : <br>
+ * It maps each instance of class in an inheritance tree into a single table. <br>
+ *
+ * <p>In case of current project, in order to specify the Single Table Inheritance to Hibernate we
+ * annotate the main Vehicle root class with @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+ * due to which a single root <b>Vehicle</b> class table will be created in the database and it will
+ * have columns for all the fields of it's subclasses(Car, Freighter, Train, Truck). <br>
+ * Additional to that, a new separate <b>"vehicle_id"</b> column would be added to the Vehicle table
+ * to save the type of the subclass object that is being stored in the database. This value is
+ * specified by the @DiscriminatorValue annotation value for each subclass in case of Hibernate.
  * <br>
- * It maps each instance of class in an inheritance tree into a single table.
  * <br>
- * <p>
- * In case of current project, in order to specify the Single Table Inheritance to Hibernate
- * we annotate the main Vehicle root class with @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
- * due to which a single root <b>Vehicle</b> class table will be created
- * in the database and it will have columns for all the fields of
- * it's subclasses(Car, Freighter, Train, Truck). <br>
- * Additional to that, a new separate <b>"vehicle_id"</b> column would be added
- * to the Vehicle table to save the type of the subclass object that
- * is being stored in the database. This value is specified by the @DiscriminatorValue annotation
- * value for each subclass in case of Hibernate. <br>
- * </p><br>
  * Below is the main Spring Boot Application class from where the Program Runs.
- * <p>
- * It implements the CommandLineRunner to run the statements at the
- * start of the application program.
- * </p>
+ *
+ * <p>It implements the CommandLineRunner to run the statements at the start of the application
+ * program.
  */
 @SpringBootApplication
 @AllArgsConstructor
 public class SingleTableInheritance implements CommandLineRunner {
 
-  //Autowiring the VehicleService class to execute the business logic methods
+  // Autowiring the VehicleService class to execute the business logic methods
   private final VehicleService vehicleService;
 
   /**
@@ -71,12 +67,16 @@ public class SingleTableInheritance implements CommandLineRunner {
    * @param args program runtime arguments
    */
   public static void main(String[] args) {
-    SpringApplication.run(SingleTableInheritance.class, args);
+    var context = SpringApplication.run(SingleTableInheritance.class, args);
+    if (args.length > 0 && "test".equals(args[0])) {
+      // Close the context immediately during tests to prevent Tomcat/background threads from
+      // hanging the JVM
+      context.close();
+    }
   }
 
   /**
-   * The starting point of the CommandLineRunner
-   * where the main program is run.
+   * The starting point of the CommandLineRunner where the main program is run.
    *
    * @param args program runtime arguments
    */
@@ -96,7 +96,6 @@ public class SingleTableInheritance implements CommandLineRunner {
     Vehicle vehicle2 = new Truck("Ford", "F-150", 3325, 14000);
     Vehicle truck1 = vehicleService.saveVehicle(vehicle2);
     log.info("Vehicle 2 saved : {}\n", truck1);
-
 
     log.info("Fetching Vehicles :- ");
 

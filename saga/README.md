@@ -31,6 +31,10 @@ Wikipedia says
 
 > Long-running transactions (also known as the saga interaction pattern) are computer database transactions that avoid locks on non-local resources, use compensation to handle failures, potentially aggregate smaller ACID transactions (also referred to as atomic transactions), and typically use a coordinator to complete or abort the transaction. In contrast to rollback in ACID transactions, compensation restores the original state, or an equivalent, and is business-specific. For example, the compensating action for making a hotel reservation is canceling that reservation.
 
+Flowchart
+
+![Saga flowchart](./etc/saga-flowchart.png)
+
 ## Programmatic Example of Saga Pattern in Java
 
 The Saga design pattern is a sequence of local transactions where each transaction updates data within a single service. It's particularly useful in a microservices architecture where each service has its own database. The Saga pattern ensures data consistency and fault tolerance across services. Here are the key components of the Saga pattern:
@@ -189,7 +193,7 @@ Trade-offs:
 ## Related Java Design Patterns
 
 * [Event Sourcing](https://java-design-patterns.com/patterns/event-sourcing/): Used to capture state changes as a sequence of events, which can complement the Saga pattern by providing a history of state changes.
-* [Command Query Responsibility Segregation (CQRS)](https://java-design-patterns.com/patterns/cqrs/): Can be used in conjunction with the Saga pattern to separate command and query responsibilities, improving scalability and fault tolerance.
+* [Command Query Responsibility Segregation (CQRS)](https://java-design-patterns.com/patterns/command-query-responsibility-segregation/): Can be used in conjunction with the Saga pattern to separate command and query responsibilities, improving scalability and fault tolerance.
 
 ## References and Credits
 
