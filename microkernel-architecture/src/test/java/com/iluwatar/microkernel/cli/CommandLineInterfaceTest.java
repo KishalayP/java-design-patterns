@@ -22,11 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.iluwatar.microkernel.cli;
 
-package com.iluwatar.microkernel;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.iluwatar.microkernel.core.MicroKernel;
+import com.iluwatar.microkernel.plugins.PluginCatalog;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -34,24 +36,50 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
-class AppTest {
+class CommandLineInterfaceTest {
 
   @Test
-  void mainStartsAndExitsTheApplication() {
+  void installsListsAndUninstallsPlugin() {
+    var kernel = new MicroKernel();
+    var output = runCli(kernel, "2\n3\n3\n1\n1\n5\n");
+
+    assertTrue(output.contains("Successfully installed: Uppercase"));
+    assertTrue(output.contains("No plugins are currently active."));
+    assertTrue(kernel.getActivePlugins().isEmpty());
+  }
+
+  @Test
+  void editsAndTransformsDocument() {
+    var kernel = new MicroKernel();
+    var output = runCli(kernel, "2\n3\n4\nhello world\n:apply Uppercase\n:view\n:exit\n5\n");
+
+    assertTrue(output.contains("Success: Document transformed by Uppercase"));
+    assertTrue(output.contains("HELLO WORLD"));
+    assertEquals("HELLO WORLD\n", kernel.readDocument());
+  }
+
+  @Test
+  void reportsInvalidMenuInputAndChoice() {
+    var output = runCli(new MicroKernel(), "invalid\n9\n5\n");
+
+    assertTrue(output.contains("Invalid input. Please enter a number."));
+    assertTrue(output.contains("Invalid option. Please choose between 1 and 5."));
+  }
+
+  private static String runCli(MicroKernel kernel, String input) {
     InputStream originalInput = System.in;
     PrintStream originalOutput = System.out;
     var output = new ByteArrayOutputStream();
 
     try {
-      System.setIn(new ByteArrayInputStream("5\n".getBytes(StandardCharsets.UTF_8)));
+      System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
       System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
-
-      App.main(new String[0]);
+      new CommandLineInterface(kernel, new PluginCatalog()).run();
     } finally {
       System.setIn(originalInput);
       System.setOut(originalOutput);
     }
 
-    assertTrue(output.toString(StandardCharsets.UTF_8).contains("Shutting down kernel"));
+    return output.toString(StandardCharsets.UTF_8);
   }
 }

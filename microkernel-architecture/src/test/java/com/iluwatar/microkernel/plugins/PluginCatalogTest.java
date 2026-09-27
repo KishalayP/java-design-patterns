@@ -22,36 +22,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.iluwatar.microkernel.plugins;
 
-package com.iluwatar.microkernel;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
-class AppTest {
+class PluginCatalogTest {
 
   @Test
-  void mainStartsAndExitsTheApplication() {
-    InputStream originalInput = System.in;
-    PrintStream originalOutput = System.out;
-    var output = new ByteArrayOutputStream();
+  void listsBuiltInPlugins() {
+    var catalog = new PluginCatalog();
 
-    try {
-      System.setIn(new ByteArrayInputStream("5\n".getBytes(StandardCharsets.UTF_8)));
-      System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
+    assertEquals(4, catalog.getAvailablePlugins().size());
+    assertTrue(catalog.getAvailablePlugins().contains("Uppercase: Converts Texts to UPPERCASE"));
+  }
 
-      App.main(new String[0]);
-    } finally {
-      System.setIn(originalInput);
-      System.setOut(originalOutput);
-    }
+  @Test
+  void createsFreshPluginFromDisplayLabel() {
+    var catalog = new PluginCatalog();
 
-    assertTrue(output.toString(StandardCharsets.UTF_8).contains("Shutting down kernel"));
+    var first = catalog.createPlugin("Uppercase: Converts Texts to UPPERCASE");
+    var second = catalog.createPlugin("Uppercase");
+
+    assertEquals("Uppercase", first.getName());
+    assertNotSame(first, second);
+  }
+
+  @Test
+  void rejectsUnknownPlugin() {
+    var catalog = new PluginCatalog();
+
+    var exception =
+        assertThrows(IllegalArgumentException.class, () -> catalog.createPlugin("Unknown"));
+
+    assertEquals("Plugin not found in catalog: Unknown", exception.getMessage());
   }
 }

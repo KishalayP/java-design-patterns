@@ -22,36 +22,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.iluwatar.microkernel.registry;
 
-package com.iluwatar.microkernel;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
+import com.iluwatar.microkernel.core.Plugin;
+import com.iluwatar.microkernel.plugins.UppercasePlugin;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class AppTest {
+class PluginRegistryTest {
 
   @Test
-  void mainStartsAndExitsTheApplication() {
-    InputStream originalInput = System.in;
-    PrintStream originalOutput = System.out;
-    var output = new ByteArrayOutputStream();
+  void registersReplacesLooksUpAndDeregistersPlugins() {
+    var registry = new PluginRegistry();
+    Plugin first = new UppercasePlugin();
+    Plugin replacement =
+        new UppercasePlugin() {
+          @Override
+          public String getDescription() {
+            return "replacement";
+          }
+        };
 
-    try {
-      System.setIn(new ByteArrayInputStream("5\n".getBytes(StandardCharsets.UTF_8)));
-      System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
+    registry.register(first);
+    assertSame(first, registry.getPlugin("Uppercase"));
+    assertEquals(List.of("Uppercase"), registry.getRegisteredPluginNames());
 
-      App.main(new String[0]);
-    } finally {
-      System.setIn(originalInput);
-      System.setOut(originalOutput);
-    }
+    registry.register(replacement);
+    assertSame(replacement, registry.getPlugin("Uppercase"));
 
-    assertTrue(output.toString(StandardCharsets.UTF_8).contains("Shutting down kernel"));
+    registry.deregister("Uppercase");
+    registry.deregister("Uppercase");
+    assertNull(registry.getPlugin("Uppercase"));
+    assertTrue(registry.getRegisteredPluginNames().isEmpty());
   }
 }
