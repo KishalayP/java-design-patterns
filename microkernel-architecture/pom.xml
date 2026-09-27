@@ -26,17 +26,10 @@
 
 -->
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <artifactId>microkernel-architecture</artifactId>
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <artifactId>java-design-patterns</artifactId>
-        <groupId>com.iluwatar</groupId>
-        <version>1.26.0-SNAPSHOT</version>
-    </parent>
-
     <build>
         <plugins>
             <plugin>
@@ -54,9 +47,36 @@
                 </executions>
                 <groupId>org.apache.maven.plugins</groupId>
             </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>3.8.0</version> <!-- Use latest version -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>     <!-- Run to check formatting -->
+                            <goal>apply</goal>     <!-- Run to format automatically -->
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <java>
+                        <googleJavaFormat>
+                            <version>1.28.0</version>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -64,9 +84,21 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <artifactId>h2</artifactId>
-            <groupId>com.h2database</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <groupId>org.slf4j</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>logback-classic</artifactId>
+            <groupId>ch.qos.logback</groupId>
         </dependency>
     </dependencies>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>java-design-patterns</artifactId>
+        <groupId>com.iluwatar</groupId>
+        <version>1.26.0-SNAPSHOT</version>
+    </parent>
 
 </project>
