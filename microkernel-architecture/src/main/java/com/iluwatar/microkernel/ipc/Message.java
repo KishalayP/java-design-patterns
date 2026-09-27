@@ -22,37 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.iluwatar.microkernel.registry;
+package com.iluwatar.microkernel.ipc;
 
-import com.iluwatar.microkernel.core.Plugin;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-
-/** Stores plugins by name for lookup and message routing. */
-@Slf4j
-public class PluginRegistry {
-
-  private final Map<String, Plugin> plugins = new HashMap<>();
-
-  /** Registers a plugin under its name, replacing any existing plugin with that name. */
-  public void register(Plugin plugin) {
-    plugins.put(plugin.getName(), plugin);
-  }
-
-  /** Removes the plugin registered under the given name, if present. */
-  public void deregister(String name) {
-    plugins.remove(name);
-  }
-
-  /** Returns the plugin registered under the given name, or {@code null} if absent. */
-  public Plugin getPlugin(String name) {
-    return plugins.get(name);
-  }
-
-  /** Returns an immutable snapshot of all currently registered plugin names. */
-  public List<String> getRegisteredPluginNames() {
-    return plugins.keySet().stream().toList();
-  }
-}
+/**
+ * Represents a message exchanged between the kernel and a plugin.
+ *
+ * @param sender the name of the sender
+ * @param recipient the name of the intended recipient
+ * @param action the requested operation
+ * @param payload the operation data
+ */
+public record Message(String sender, String recipient, String action, String payload) {}

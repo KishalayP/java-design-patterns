@@ -22,37 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.iluwatar.microkernel.registry;
+package com.iluwatar.microkernel.plugins;
 
-import com.iluwatar.microkernel.core.Plugin;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.iluwatar.microkernel.core.AbstractOnDemandPlugin;
+import com.iluwatar.microkernel.ipc.Message;
 import lombok.extern.slf4j.Slf4j;
 
-/** Stores plugins by name for lookup and message routing. */
 @Slf4j
-public class PluginRegistry {
+public class UppercasePlugin extends AbstractOnDemandPlugin {
 
-  private final Map<String, Plugin> plugins = new HashMap<>();
-
-  /** Registers a plugin under its name, replacing any existing plugin with that name. */
-  public void register(Plugin plugin) {
-    plugins.put(plugin.getName(), plugin);
+  /** {@inheritDoc} */
+  @Override
+  public String getName() {
+    return "Uppercase";
   }
 
-  /** Removes the plugin registered under the given name, if present. */
-  public void deregister(String name) {
-    plugins.remove(name);
+  /** {@inheritDoc} */
+  @Override
+  public String getDescription() {
+    return "Converts Texts to UPPERCASE";
   }
 
-  /** Returns the plugin registered under the given name, or {@code null} if absent. */
-  public Plugin getPlugin(String name) {
-    return plugins.get(name);
-  }
-
-  /** Returns an immutable snapshot of all currently registered plugin names. */
-  public List<String> getRegisteredPluginNames() {
-    return plugins.keySet().stream().toList();
+  /** Converts the payload to uppercase for a transform action. */
+  @Override
+  public String handleMessage(Message message) {
+    if ("TRANSFORM".equalsIgnoreCase(message.action())) {
+      LOGGER.info("UppercasePlugin: Transforming document.");
+      return message.payload().toUpperCase();
+    }
+    return "ERROR: Action not supported.";
   }
 }

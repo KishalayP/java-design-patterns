@@ -22,37 +22,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.iluwatar.microkernel.registry;
+package com.iluwatar.microkernel.plugins;
 
-import com.iluwatar.microkernel.core.Plugin;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+import com.iluwatar.microkernel.core.AbstractOnDemandPlugin;
+import com.iluwatar.microkernel.ipc.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** Stores plugins by name for lookup and message routing. */
-@Slf4j
-public class PluginRegistry {
+public class RemoveSpacesPlugin extends AbstractOnDemandPlugin {
 
-  private final Map<String, Plugin> plugins = new HashMap<>();
+  private static final Logger log = LoggerFactory.getLogger(RemoveSpacesPlugin.class);
 
-  /** Registers a plugin under its name, replacing any existing plugin with that name. */
-  public void register(Plugin plugin) {
-    plugins.put(plugin.getName(), plugin);
+  /** {@inheritDoc} */
+  @Override
+  public String getName() {
+    return "RemoveSpaces";
   }
 
-  /** Removes the plugin registered under the given name, if present. */
-  public void deregister(String name) {
-    plugins.remove(name);
+  /** {@inheritDoc} */
+  @Override
+  public String getDescription() {
+    return "Removes Spaces From Texts";
   }
 
-  /** Returns the plugin registered under the given name, or {@code null} if absent. */
-  public Plugin getPlugin(String name) {
-    return plugins.get(name);
-  }
-
-  /** Returns an immutable snapshot of all currently registered plugin names. */
-  public List<String> getRegisteredPluginNames() {
-    return plugins.keySet().stream().toList();
+  /** Removes all whitespace from the payload for a transform action. */
+  @Override
+  public String handleMessage(Message message) {
+    if ("TRANSFORM".equalsIgnoreCase(message.action())) {
+      log.info("RemoveSpacesPlugin: Stripping whitespace.");
+      return message.payload().replaceAll("\\s+", "");
+    }
+    return "ERROR: Action not supported.";
   }
 }

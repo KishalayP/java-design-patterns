@@ -22,37 +22,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.iluwatar.microkernel.registry;
+package com.iluwatar.microkernel.plugins;
 
-import com.iluwatar.microkernel.core.Plugin;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.iluwatar.microkernel.core.AbstractLifecyclePlugin;
 import lombok.extern.slf4j.Slf4j;
 
-/** Stores plugins by name for lookup and message routing. */
 @Slf4j
-public class PluginRegistry {
+public class NeonThemePlugin extends AbstractLifecyclePlugin {
 
-  private final Map<String, Plugin> plugins = new HashMap<>();
+  private static final String ANSI_RESET = "\u001B[0m";
+  private static final String ANSI_GREEN = "\u001B[32m";
 
-  /** Registers a plugin under its name, replacing any existing plugin with that name. */
-  public void register(Plugin plugin) {
-    plugins.put(plugin.getName(), plugin);
+  /** {@inheritDoc} */
+  @Override
+  public String getName() {
+    return "Theme";
   }
 
-  /** Removes the plugin registered under the given name, if present. */
-  public void deregister(String name) {
-    plugins.remove(name);
+  /** {@inheritDoc} */
+  @Override
+  public String getDescription() {
+    return "Neon Theme for Editor";
   }
 
-  /** Returns the plugin registered under the given name, or {@code null} if absent. */
-  public Plugin getPlugin(String name) {
-    return plugins.get(name);
+  /** Applies the terminal color used by the neon theme. */
+  @Override
+  protected void doStart() {
+    System.out.print(ANSI_GREEN);
+    LOGGER.info("NeonThemePlugin: Neon theme applied.");
   }
 
-  /** Returns an immutable snapshot of all currently registered plugin names. */
-  public List<String> getRegisteredPluginNames() {
-    return plugins.keySet().stream().toList();
+  /** Restores the terminal's default color. */
+  @Override
+  protected void doStop() {
+    System.out.print(ANSI_RESET);
+    LOGGER.info("ThemePlugin: Default theme restored.");
   }
 }
