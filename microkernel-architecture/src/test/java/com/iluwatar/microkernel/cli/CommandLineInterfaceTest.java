@@ -49,6 +49,37 @@ class CommandLineInterfaceTest {
   }
 
   @Test
+  void installsDuplicateAndUninstallsPlugin() {
+    var kernel = new MicroKernel();
+    var output = runCli(kernel, "2\n3\n2\n3\n1\n3\n1\n1\n5\n");
+
+    assertTrue(output.contains("Successfully installed: Uppercase"));
+    assertTrue(output.contains("Plugin 'Uppercase' is already installed."));
+    assertTrue(output.contains("Active Plugins: [Uppercase]"));
+    assertTrue(output.contains("No plugins are currently active."));
+    assertTrue(kernel.getActivePlugins().isEmpty());
+  }
+
+  @Test
+  void reportsNoPluginsToUninstall() {
+    var output = runCli(new MicroKernel(), "3\n5\n");
+
+    assertTrue(output.contains("No plugins available to uninstall."));
+  }
+
+  @Test
+  void reportsInvalidInstallAndUninstallSelections() {
+    var kernel = new MicroKernel();
+    var output =
+        runCli(kernel, "2\ninvalid\n2\n0\n2\n5\n2\n6\n2\n3\n3\ninvalid\n3\n0\n3\n2\n3\n1\n5\n");
+
+    assertTrue(output.contains("Invalid input."));
+    assertTrue(output.contains("Invalid selection."));
+    assertTrue(output.contains("Successfully installed: Uppercase"));
+    assertTrue(kernel.getActivePlugins().isEmpty());
+  }
+
+  @Test
   void editsAndTransformsDocument() {
     var kernel = new MicroKernel();
     var output = runCli(kernel, "2\n3\n4\nhello world\n:apply Uppercase\n:view\n:exit\n5\n");
@@ -56,6 +87,22 @@ class CommandLineInterfaceTest {
     assertTrue(output.contains("Success: Document transformed by Uppercase"));
     assertTrue(output.contains("HELLO WORLD"));
     assertEquals("HELLO WORLD\n", kernel.readDocument());
+  }
+
+  @Test
+  void clearsDocumentAndReportsUnknownPlugin() {
+    var kernel = new MicroKernel();
+    var output =
+        runCli(
+            kernel,
+            "2\n3\n4\nold text\n:clear\n:apply \nnew text\n:apply Missing\n:apply Uppercase\n:view\n:exit\n5\n");
+
+    assertTrue(output.contains("Document cleared."));
+    assertTrue(output.contains("Usage: :apply <plugin_name>"));
+    assertTrue(output.contains("ERROR: Plugin 'Missing' is not active"));
+    assertTrue(output.contains("Success: Document transformed by Uppercase"));
+    assertTrue(output.contains("NEW TEXT"));
+    assertEquals("NEW TEXT\n", kernel.readDocument());
   }
 
   @Test

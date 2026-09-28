@@ -25,6 +25,7 @@
 
 package com.iluwatar.microkernel;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,11 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 class AppTest {
+
+  @Test
+  void canBeInstantiated() {
+    assertNotNull(new App());
+  }
 
   @Test
   void mainStartsAndExitsTheApplication() {

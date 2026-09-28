@@ -26,9 +26,13 @@ package com.iluwatar.microkernel.plugins;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.iluwatar.microkernel.core.AbstractLifecyclePlugin;
+import com.iluwatar.microkernel.ipc.IpcRouter;
 import com.iluwatar.microkernel.ipc.Message;
+import com.iluwatar.microkernel.registry.PluginRegistry;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -87,7 +91,40 @@ class PluginImplementationsTest {
     assertTrue(output.toString(StandardCharsets.UTF_8).contains("\u001B[0m"));
   }
 
+  @Test
+  void lifecyclePluginStoresIpcRouterDuringInitialization() {
+    var plugin = new TestLifecyclePlugin();
+    var router = new IpcRouter(new PluginRegistry());
+
+    plugin.initialize(router);
+
+    assertSame(router, plugin.getIpcRouter());
+  }
+
   private static Message message(String action, String payload) {
     return new Message("test", "plugin", action, payload);
+  }
+
+  private static class TestLifecyclePlugin extends AbstractLifecyclePlugin {
+
+    @Override
+    public String getName() {
+      return "Test";
+    }
+
+    @Override
+    public String getDescription() {
+      return "Test lifecycle plugin";
+    }
+
+    @Override
+    protected void doStart() {}
+
+    @Override
+    protected void doStop() {}
+
+    private IpcRouter getIpcRouter() {
+      return ipcRouter;
+    }
   }
 }

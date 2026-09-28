@@ -34,7 +34,7 @@ import java.util.Scanner;
 public class CommandLineInterface {
 
   private final MicroKernel kernel;
-  private final PluginCatalog catalog; // <-- Injected Catalog
+  private final PluginCatalog catalog;
   private final Scanner scanner;
 
   /**
@@ -150,7 +150,7 @@ public class CommandLineInterface {
         System.out.println("Document cleared.");
       } else if (input.startsWith(":apply ")) {
         String[] parts = input.split(" ", 2);
-        if (parts.length < 2) {
+        if (parts[1].isBlank()) {
           System.out.println("Usage: :apply <plugin_name>");
           continue;
         }
